@@ -1,5 +1,5 @@
 {
-  "name": "frontend-project-lvl3",
+  "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/bombom70/frontend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/bombom70/frontend-project-lvl3/actions)",
   "private": true,
@@ -19,6 +19,7 @@
   "bugs": {
     "url": "https://github.com/bombom70/frontend-project-lvl3/issues"
   },
+  "main": "src/init.js",
   "homepage": "https://github.com/bombom70/frontend-project-lvl3#readme",
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -38,9 +39,12 @@
     "webpack-dev-server": "^3.11.1"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "bootstrap": "^5.0.0-beta1",
+    "i18next": "^19.8.4",
     "jquery": "^3.5.1",
     "lodash": "^4.17.20",
-    "on-change": "^2.2.1"
+    "on-change": "^2.2.1",
+    "yup": "^0.32.8"
   }
 }

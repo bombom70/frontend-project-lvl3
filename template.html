@@ -6,14 +6,28 @@
     <title>rss</title>
 </head>
 <body>
-    <div class="container" id="root">
-        <div class="jumbotron">
-            <h1 class="display-4">RSS Reader</h1>
-            <hr class="my-4">
-            <p class="lead">Enter link</p>
-            <input type="text">
-            <a class="btn btn-primary btn-lg" href="#" role="button">Enter</a>
-        </div>
-    </div>
+    <main class="flex-grow-1">
+        <section class="container-fluid bg-dark p-5">
+            <div class="jumbotron">
+                <div class="col-md-10 col-lg-8 mx-auto text-white">
+                    <h1 class="display-3">RSS Reader</h1>
+                    <p class="lead">Enter link</p>
+                    <form class="rss-form input-group mb-3">
+                        <input autofocus required class="form-control" type="text" name="url">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                    <div class="feedback"></div>
+                </div>
+            </div>
+        </section>
+        <section class="container-fluid p-5">
+            <div class="row">
+                <div class="col-md-10 col-lg-8 mx-auto feeds"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-lg-8 mx-auto posts"></div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
