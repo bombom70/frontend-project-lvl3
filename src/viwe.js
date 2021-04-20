@@ -67,6 +67,7 @@ export default (state) => {
       }
     }
     if (path === 'feeds') {
+      console.log(value);
       const ulEl = document.createElement('ul');
       value.forEach((feed) => {
         const liEl = document.createElement('li');

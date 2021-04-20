@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './style.css';
 import * as yup from 'yup';
 import axios from 'axios';
 import render from './viwe';
@@ -11,34 +9,25 @@ const schema = yup.object().shape({
   url: yup.string().required(i18next.t('rssRequired')).url(),
 });
 
-const loadedPosts = (urls) => {
-  const promises = urls.map((url) => axios.get(url));
-  Promise.all(promises).then((res) => {
-    console.log(res);
-    return res;
-  });
-  setTimeout(() => {
-    console.log('!')
-    loadedPosts(urls);
-  }, 5000);
-};
-
 const parser = (data) => {
+  console.log('data', data);
   const domParser = new DOMParser();
-  const doc = domParser.parseFromString(data, "application/xml");
-  const titleFeeds = doc.querySelector('title');
-  const descriptionFeeds = doc.querySelector('description');
-  const items = doc.querySelectorAll('item');
-  const id = _.uniqueId();
-  const posts = [...items].reduce((acc, item) => {
-    const linkTag = item.querySelector('link');
-    const link = linkTag.textContent;
-    const title = item.querySelector('title');
-    const description = item.querySelector('description');
-    return [...acc, { feedId: id, id: _.uniqueId(), name: title.textContent, description: description.textContent, link }];
-  }, []);
-  const feeds = { id, name: titleFeeds.textContent, description: descriptionFeeds.textContent};
-  return { feeds, posts };
+  const doc = domParser.parseFromString(data.contents, "application/xml");
+  const items = [...doc.getElementsByTagName('item')];
+  const mappedItems = items.map((el) => {
+    const newItem = {
+      title: el.querySelector('title').textContent,
+      link: el.querySelector('link').textContent,
+      description: el.querySelector('description').textContent,
+    };
+    return newItem;
+  });
+  console.log('!!', doc);
+  return {
+    title: doc.querySelector('title').textContent,
+    chanelDescription: doc.querySelector('description').textContent,
+    items: mappedItems,
+  };
 };
 
 const run = () => {
@@ -53,6 +42,23 @@ const run = () => {
     posts: [],
     data: '',
   };
+
+  const loadedPosts = () => {
+    const promises = state.urls.map(address => axios.get(address));
+    Promise.all(promises).then((responses) => {
+      responses.forEach((res) => {
+        const { title, items } = parser(res.data);
+        const actualFeedIndex = state.feeds.findIndex(el => el.title === title);
+        const oldItems = state.feeds[actualFeedIndex].items;
+        const newItems = _.unionWith(oldItems, items, _.isEqual);
+        if (!_.isEqualWith(newItems, oldItems, (e1, e2) => _.isEqual(e1, e2))) {
+          state.feeds[actualFeedIndex].items = newItems;
+        }
+      });
+      setTimeout(loadedPosts, 5000);
+    });
+  };
+
   const watchedState = render(state);
   const form = document.querySelector('form');
 
@@ -72,9 +78,7 @@ const run = () => {
         }
         axios.get(url)
           .then((res) => {
-            const { feeds, posts } = parser(res.data.contents);
-            watchedState.feeds.push(feeds);
-            watchedState.posts.push(posts);
+            watchedState.feeds.push(parser(res.data));
           })
           .catch((e) => {
             watchedState.formState.state = 'networkError';
@@ -92,8 +96,7 @@ const run = () => {
         return;
       }
       watchedState.formState.state = 'invalid';
-    });
-    loadedPosts(watchedState.urls);
+    }).then(() => loadedPosts());
   });
 };
 export default () => {
